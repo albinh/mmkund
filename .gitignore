@@ -1,0 +1,7 @@
+.vscode
+venv
+__pycache__
+__pycache__/
+*.py[cod]
+local_settings.py
+db.sqlite3
