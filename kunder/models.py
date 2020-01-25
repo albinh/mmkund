@@ -5,6 +5,7 @@ from math import floor
 
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.core.exceptions import ObjectDoesNotExist
 
 
 from django.db import models
@@ -32,6 +33,20 @@ class Customer(models.Model):
     user = models.OneToOneField("User", on_delete=models.CASCADE)
     week_0 = models.BooleanField(default=False)
     week_1 = models.BooleanField(default=False)
+    email = models.EmailField(
+        verbose_name='e-post',
+        max_length=255,
+        unique=True
+    ) 
+
+    def save(self, *args, **kwargs):
+        try: 
+            self.user
+        except ObjectDoesNotExist:
+            self.user = User( is_active=True, is_superuser=False, is_staff=False )
+            self.user.save()
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+
 
     def full_adress(self):
         return '%s %s %s' % (self.street, self.postal_code, self.city)
@@ -64,8 +79,8 @@ class UserManager(BaseUserManager):
             email=self.normalize_email(email),
             is_active=True,
             is_customer=True,
-            is_superuser=True,
-            is_staff=True,
+            is_superuser=False,
+            is_staff=False,
             username=uuid.uuid4(),
         )
         user.save()
@@ -92,7 +107,6 @@ class UserManager(BaseUserManager):
             is_superuser=True,
             is_staff=True,
             username=username
-
         )
 
         user.set_password(password)
@@ -114,7 +128,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         verbose_name='e-post',
         max_length=255,
-        unique=True
+        unique=True,
+        blank=True
     )
     objects = UserManager()
     customers = CustomerUserManager()
@@ -139,12 +154,15 @@ class DeliveryReciver(models.Model):
     street = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=5, validators=[Customer.zip_validator])
     city = models.CharField(max_length=20)
-
+    
 
 class Delivery(models.Model):
     """ Model for a specific Delivery (past, current or future) """
     date = models.DateField()
     is_populated = models.BooleanField(default=False)
+
+    def __str__ (self):
+        return "%s #%s" % (self.date, self.week_number()) 
 
     def week_number(self):
         """
@@ -158,7 +176,7 @@ class Delivery(models.Model):
 
         days = (self.date - date(year=2018, month=1, day=1)).days
 
-        return floor(days / 7) % 2
+        return floor(days / 7)
 
     def is_week_1(self):
         """
