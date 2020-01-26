@@ -50,6 +50,40 @@ class UserTestCase (TestCase):
         self.assertEqual(u.customer.week_0, True)
         self.assertEqual(u.customer.week_1, True)
 
+    def create_user ( self, id, week_0, week_1 ):
+        return Customer( email="test@test.com",
+                                      first_name="id",
+                                      last_name="Holmgren",
+                                      postal_code="92294",
+                                      city="Tvärålund",
+                                      phone="0730241790",
+                                      week_0=week_0,
+                                      week_1=week_1)
+
+    def test_upcomming(self):
+        c1 = self.create_user("alla", True, True)
+        c2 = self.create_user("vecka0", True,False)
+        c3 = self.create_user("vecka1", False, True)
+
+        d1 = Delivery(date=date(year=2020, month=1, day=1))
+        d1.save()
+        d2 = Delivery(date=date(year=2020, month=1, day=8))
+        d2.save()
+        d3 = Delivery(date=date(year=2020, month=1, day=15))
+        d3.save()
+        d4 = Delivery(date=date(year=2020, month=1, day=22))
+        d4.save()
+        d5 = Delivery(date=date(year=2020, month=1, day=29))
+        d5.save()
+
+        c1.cancel(d1)
+        c2.cancel(d1)
+        c2.cancel(d2)
+        self.assertEqual(c1.upcomming_deliveries().count(), 4 )
+        self.assertEqual(c2.upcomming_deliveries().count(), 2 )
+        self.assertEqual(c3.upcomming_deliveries().count(), 2 )
+
+
     def test_customers_manager(self):
         u = User.objects.create_superuser(email="albin@albinholmgren.se",
                                           password="password",

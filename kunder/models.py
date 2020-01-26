@@ -70,6 +70,19 @@ class Customer(models.Model):
         """ customer full name (first name + last name) """
         return '%s %s' % (self.first_name, self.last_name)
 
+    def upcomming_deliveries(self):
+
+        query = Delivery.objects.filter (  )
+
+        if not self.week_0: 
+            query = query.exclude 
+
+        if self.is_week_0():
+            query = Customer.objects.filter(week_0=True)
+        else:
+            query = Customer.objects.filter(week_1=True)
+        query = query.exclude(cancels__pk=self.pk)
+
 
 class UserManager(BaseUserManager):
     """ ModelManager for User model """
@@ -159,6 +172,7 @@ class DeliveryReciver(models.Model):
 class Delivery(models.Model):
     """ Model for a specific Delivery (past, current or future) """
     date = models.DateField()
+    week_number = models.PositiveIntegerField()
     is_populated = models.BooleanField(default=False)
 
     def __str__ (self):
