@@ -20,6 +20,16 @@ class CustomerAdmin (admin.ModelAdmin):
                 ('cancels'))
                 
     filter_horizontal = ('cancels',)
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+
+        # TODO: Perhaps an ugly hack. Using the url hardcoded.
+        object_id = int([i for i in str(request.path).split('/') if i][-2])
+        
+        if db_field.name == "cancels":
+            pass
+            kwargs["queryset"] = Customer.objects.get(pk=object_id).upcomming_deliveries_including_canceled()
+        return super(CustomerAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
 admin.site.register(Customer, CustomerAdmin)
 
 class DeliveryAdmin (admin.ModelAdmin):

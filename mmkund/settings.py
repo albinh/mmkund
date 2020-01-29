@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import django_heroku
+import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -94,7 +95,20 @@ DATABASES = {
 "PASSWORD": "",
 "HOST": "localhost",
 "PORT": "",
+'TEST': { "NAME":"mmkunder_test"}
 }
+}
+
+if "test" in sys.argv[0]:
+    DATABASES = {
+        "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "mmkunder_test",
+        "USER": "postgres",
+        "PASSWORD": "",
+        "HOST": "localhost",
+        "PORT": "",
+    }
 }
 
 

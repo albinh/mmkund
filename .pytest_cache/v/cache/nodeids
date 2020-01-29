@@ -1,0 +1,16 @@
+[
+  "kunder/tests.py::UserTestCase::test_create_customer",
+  "kunder/tests.py::UserTestCase::test_create_superuser",
+  "kunder/tests.py::UserTestCase::test_createcustomer",
+  "kunder/tests.py::UserTestCase::test_customers_manager",
+  "kunder/tests.py::UserTestCase::test_fullname",
+  "kunder/tests.py::UserTestCase::test_upcomming",
+  "kunder/tests.py::DeliveryTestCase::test_cancel",
+  "kunder/tests.py::DeliveryTestCase::test_cancel_populate",
+  "kunder/tests.py::DeliveryTestCase::test_create_delivery",
+  "kunder/tests.py::DeliveryTestCase::test_double_populate",
+  "kunder/tests.py::DeliveryTestCase::test_forecast",
+  "kunder/tests.py::DeliveryTestCase::test_populate",
+  "kunder/tests.py::DeliveryTestCase::test_populate_old",
+  "kunder/tests.py::DeliveryTestCase::test_weeknumber"
+]

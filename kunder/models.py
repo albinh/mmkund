@@ -5,7 +5,6 @@ from math import floor
 
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
-from django.core.exceptions import ObjectDoesNotExist
 
 
 from django.db import models
@@ -40,9 +39,7 @@ class Customer(models.Model):
     ) 
 
     def save(self, *args, **kwargs):
-        try: 
-            self.user
-        except ObjectDoesNotExist:
+        if not hasattr(self, 'user'):
             self.user = User( is_active=True, is_superuser=False, is_staff=False )
             self.user.save()
         super().save(*args, **kwargs)  # Call the "real" save() method.
@@ -70,45 +67,24 @@ class Customer(models.Model):
         """ customer full name (first name + last name) """
         return '%s %s' % (self.first_name, self.last_name)
 
-    def upcomming_deliveries(self):
-
+    def upcomming_deliveries_including_canceled(self):
         query = Delivery.objects.filter (  )
 
-        if not self.week_0: 
-            query = query.exclude 
 
-        if self.is_week_0():
-            query = Customer.objects.filter(week_0=True)
-        else:
-            query = Customer.objects.filter(week_1=True)
-        query = query.exclude(cancels__pk=self.pk)
 
+        if not self.week_0:
+            query = query.exclude(week_0=True)
+        if not self.week_1:
+            query = query.exclude(week_1=True)
+        return query
+
+    def upcomming_deliveries(self):    
+        return  self.upcomming_deliveries_including_canceled().exclude(canceled_customers=self)
+        
 
 class UserManager(BaseUserManager):
     """ ModelManager for User model """
-    def create_user(self, email, first_name, last_name, postal_code, city, phone, week_0, week_1):
-        """ Create a user-customer. Both User model and Customer profile model is created """
-        user = self.model(
-            email=self.normalize_email(email),
-            is_active=True,
-            is_customer=True,
-            is_superuser=False,
-            is_staff=False,
-            username=uuid.uuid4(),
-        )
-        user.save()
-        customer = Customer(
-            user=user,
-            first_name=first_name,
-            last_name=last_name,
-            postal_code=postal_code,
-            city=city,
-            phone=phone,
-            week_0=week_0,
-            week_1=week_1
-        )
-        customer.save()
-        return user
+  
 
     def create_superuser(self, email, password, username):
         """ Create superuser / staff """
@@ -141,12 +117,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         verbose_name='e-post',
         max_length=255,
-        unique=True,
+        unique=False,
         blank=True
     )
     objects = UserManager()
     customers = CustomerUserManager()
-    username = models.CharField(max_length=25, unique=True)
+    username = models.CharField(max_length=40, unique=True, default=uuid.uuid4)
     is_active = models.BooleanField(default=True)
     is_customer = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -174,6 +150,13 @@ class Delivery(models.Model):
     date = models.DateField()
     week_number = models.PositiveIntegerField()
     is_populated = models.BooleanField(default=False)
+    week_0 = models.BooleanField(default=False)
+    week_1 = models.BooleanField(default=True)
+    def save(self, *args, **kwargs):
+        self.week_0 = self.week_number()%2==0
+        self.week_1 = self.week_number()%2==1
+        super(Delivery, self).save(*args, **kwargs)
+
 
     def __str__ (self):
         return "%s #%s" % (self.date, self.week_number()) 
