@@ -2,8 +2,6 @@ from django.contrib import admin
 from kunder.models import Customer, Delivery, User
 from django.contrib.auth.admin import UserAdmin
 
-# Register your models here.
-
 class UserAdminInline (admin.TabularInline):
     model = User
 
