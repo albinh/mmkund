@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
+
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -89,7 +91,7 @@ AUTH_USER_MODEL = 'kunder.User'
 
 DATABASES = {
   "default": {
-"ENGINE": "django.db.backends.postgresql_psycopg2",
+"ENGINE": "django.contrib.gis.db.backends.postgis",
 "NAME": "mmkunder",
 "USER": "postgres",
 "PASSWORD": "",

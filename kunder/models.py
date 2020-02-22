@@ -224,3 +224,6 @@ class Delivery(models.Model):
 
         self.is_populated = True
         self.save()
+
+class DeliveryRoute(models.Model):
+    mpoly = models.MultiPolygonField()

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Marstorps Mat: Logga in</title>
+   
+  </head>
+  <body>
+    <h1>Logga in hos Marstorps Mat</h1>
+    <p>Hej</p>
+    <p>För att logga in hos Marstorps Mat, ange din e-post nedan</p>
+    <form action="/logga-in-kund" method="post">
+
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+    <!-- page content -->
+  </body>
+</html>
